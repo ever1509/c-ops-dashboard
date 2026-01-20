@@ -1,0 +1,17 @@
+contractor-ops-dashboard/
+  api/
+    ContractorOps.slnx
+    src/
+      ContractorOps.Api/
+        ContractorOps.Api.csproj
+        Program.cs
+        ...
+  web/
+    contractor-ops-web/
+      package.json
+      src/
+      ...
+  docs/
+    DOMAIN.md
+  README.md
+  .gitignore
