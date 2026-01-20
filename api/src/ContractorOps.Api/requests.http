@@ -4,4 +4,35 @@
 GET {{baseUrl}}/health
 Accept: application/json
 
-###
+### Get All Clients
+GET {{baseUrl}}/clients
+Accept: application/json
+
+### Create New Client
+POST {{baseUrl}}/clients
+Content-Type: application/json
+{
+  "name": "New Client",
+  "webSite": "https://newclient.com",
+   "notes": "This is a new client."
+}
+
+### Get Client by ID
+@clientId = 1
+GET {{baseUrl}}/clients/{{clientId}}
+Accept: application/json
+
+### Update Client
+@clientIdToUpdate = 1
+PUT {{baseUrl}}/clients/{{clientIdToUpdate}}
+Content-Type: application/json
+{
+  "name": "Updated Client Name",
+  "webSite": "https://updatedclient.com",
+  "notes": "Updated notes for the client."
+}
+
+### Delete Client
+@clientIdToDelete = 1
+DELETE {{baseUrl}}/clients/{{clientIdToDelete}}
+Accept: application/json
