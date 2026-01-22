@@ -1,4 +1,3 @@
-using System.Globalization;
 using ContractorOps.Api.Data;
 using ContractorOps.Api.Domain;
 using ContractorOps.Api.Dtos;
@@ -7,89 +6,82 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContractorOps.Api.Controllers;
 
+[ApiController]
 [Route("api/[controller]")]
-public class ClientsControllers : ControllerBase
+public class ClientsController : ControllerBase
 {
-    private readonly AppDbContext _dbContext;
+    private readonly AppDbContext _context;
 
-    public ClientsControllers(AppDbContext dbContext)
+    public ClientsController(AppDbContext context)
     {
-        _dbContext = dbContext;
+        _context = context;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetClients()
+    public async Task<ActionResult<IEnumerable<Client>>> GetClients()
     {
-        var clients = await _dbContext.Clients
-            .Select(c => new ClientResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Website = c.Website ?? string.Empty,
-                Notes = c.Notes ?? string.Empty,
-                CreatedAt = c.CreatedAt.ToString(CultureInfo.InvariantCulture)
-            })
-            .ToListAsync();
-        return Ok(clients);
+        return await _context.Clients.ToListAsync();
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetClientById(int id)
+    public async Task<ActionResult<Client>> GetClient(int id)
     {
-        var client = await _dbContext.Clients.FindAsync(id);
+        var client = await _context.Clients.FindAsync(id);
         if (client == null)
         {
             return NotFound();
         }
-
-        return Ok(client);
+        return client;
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateClient([FromBody] ClientRequestDto clientDto)
+    public async Task<ActionResult<Client>> CreateClient(ClientRequestDto client)
     {
-        if (string.IsNullOrWhiteSpace(clientDto.Name))
-            return BadRequest("Client name is required.");
-        
-        var client = new Client
+        var newClient = new Client
         {
-            Name = clientDto.Name,
-            Website = clientDto.Website,
-            Notes = clientDto.Notes,
+            Name = client.Name,
+            Website = client.Website,
+            Notes = client.Notes,
             CreatedAt = DateTime.UtcNow
         };
-        _dbContext.Clients.Add(client);
-         await _dbContext.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetClientById), new {id = client.Id}, client);
+        _context.Clients.Add(newClient);
+        await _context.SaveChangesAsync();
+        return CreatedAtAction(nameof(GetClient), new { id = newClient.Id }, newClient);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateClient(int id, [FromBody] ClientRequestDto updatedClient)
+    public async Task<IActionResult> UpdateClient(int id, ClientRequestDto client)
     {
-        var client = _dbContext.Clients.Find(id);
-        if (client == null)
+        if (id <=0)
+        {
+            return BadRequest();
+        }
+
+        var existingClient = await _context.Clients.FindAsync(id);
+        if (existingClient == null)
         {
             return NotFound();
         }
+        existingClient.Name = client.Name;
+        existingClient.Website = client.Website;
+        existingClient.Notes = client.Notes;
 
-        client.Name = updatedClient.Name;
-        client.Website = updatedClient.Website;
-        client.Notes = updatedClient.Notes;
-        await _dbContext.SaveChangesAsync();
+        await _context.SaveChangesAsync();
+
         return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteClient(int id)
     {
-        var client = _dbContext.Clients.Find(id);
+        var client = await _context.Clients.FindAsync(id);
         if (client == null)
         {
             return NotFound();
         }
 
-        _dbContext.Clients.Remove(client);
-       await _dbContext.SaveChangesAsync();
+        _context.Clients.Remove(client);
+        await _context.SaveChangesAsync();
         return NoContent();
     }
 }

@@ -5,11 +5,11 @@ GET {{baseUrl}}/health
 Accept: application/json
 
 ### Get All Clients
-GET {{baseUrl}}/clients
+GET {{baseUrl}}/api/clients
 Accept: application/json
 
 ### Create New Client
-POST {{baseUrl}}/clients
+POST {{baseUrl}}/api/clients
 Content-Type: application/json
 {
   "name": "New Client",
@@ -18,21 +18,21 @@ Content-Type: application/json
 }
 
 ### Get Client by ID
-@clientId = 1
-GET {{baseUrl}}/clients/{{clientId}}
+@clientId = 2
+GET {{baseUrl}}/api/clients/{{clientId}}
 Accept: application/json
 
 ### Update Client
-@clientIdToUpdate = 1
-PUT {{baseUrl}}/clients/{{clientIdToUpdate}}
+@clientIdToUpdate = 2
+PUT {{baseUrl}}/api/clients/{{clientIdToUpdate}}
 Content-Type: application/json
 {
-  "name": "Updated Client Name",
+  "name": "Updated Client",
   "webSite": "https://updatedclient.com",
-  "notes": "Updated notes for the client."
+   "notes": "Updated client."
 }
 
 ### Delete Client
-@clientIdToDelete = 1
-DELETE {{baseUrl}}/clients/{{clientIdToDelete}}
+@clientIdToDelete = 2
+DELETE {{baseUrl}}/api/clients/{{clientIdToDelete}}
 Accept: application/json
