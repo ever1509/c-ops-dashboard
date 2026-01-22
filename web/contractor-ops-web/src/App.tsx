@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import { getClients, Client } from "./api/clientsApi";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getClients()
+      .then(setClients)
+      .catch(() => setError("Failed to load clients"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  if (clients.length === 0) return <p>No clients yet</p>;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div style={{ padding: "1rem" }}>
+      <h1>Clients</h1>
+      <table border={1} cellPadding={8}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Website</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {clients.map(c => (
+            <tr key={c.id}>
+              <td>{c.name}</td>
+              <td>{c.website ?? "-"}</td>
+              <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
-export default App
+export default App;
